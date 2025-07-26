@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const Main = () => {
   const [meme, setMeme] = useState({
@@ -6,6 +6,13 @@ const Main = () => {
     bottomText: "Walk into Mordor",
     imageUrl: "http://i.imgflip.com/1bij.jpg",
   });
+  const [allMemes, setAllMemes] = useState([]);
+
+  useEffect(() => {
+    fetch("https://api.imgflip.com/get_memes")
+      .then((res) => res.json())
+      .then((data) => setAllMemes(data.data.memes));
+  }, []);
 
   const handleChange = (event) => {
     const { value, name } = event.currentTarget;
@@ -13,6 +20,16 @@ const Main = () => {
       return { ...prevMeme, [name]: value };
     });
   };
+
+  function handleOnClick() {
+    setMeme((prevMeme) => {
+      return {
+        ...prevMeme,
+        imageUrl: allMemes.at(Math.floor(Math.random() * allMemes.length - 1))
+          .url,
+      };
+    });
+  }
 
   return (
     <main>
@@ -37,7 +54,7 @@ const Main = () => {
             value={meme.bottomText}
           />
         </label>
-        <button>Get a new meme image 🖼</button>
+        <button onClick={handleOnClick}>Get a new meme image 🖼</button>
       </div>
       <div className="meme">
         <img src={meme.imageUrl} />
